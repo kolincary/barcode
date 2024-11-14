@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Generator</title>
+</head>
+<body>
+    <h1>Generate Barcode or QR Code</h1>
+    <form id="barcode-form">
+        <label>Enter Text: <input type="text" id="text" required></label>
+        <label>Barcode Type:
+            <select id="type">
+                <option value="code128">Code 128</option>
+                <option value="qrcode">QR Code</option>
+            </select>
+        </label>
+        <button type="submit">Generate</button>
+    </form>
+    <img id="barcode-image" alt="Barcode Image" />
+
+    <script>
+        document.getElementById("barcode-form").onsubmit = async function (e) {
+            e.preventDefault();
+            const text = document.getElementById("text").value;
+            const type = document.getElementById("type").value;
+            const response = await fetch(`/generate-barcode?text=${text}&type=${type}`);
+            const blob = await response.blob();
+            document.getElementById("barcode-image").src = URL.createObjectURL(blob);
+        };
+    </script>
+</body>
+</html>
