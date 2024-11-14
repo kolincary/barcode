@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barcode Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
 <body>
     <h1>Generate Barcode or QR Code</h1>
@@ -11,22 +13,36 @@
         <label>Enter Text: <input type="text" id="text" required></label>
         <label>Barcode Type:
             <select id="type">
-                <option value="code128">Code 128</option>
+                <option value="barcode">Barcode</option>
                 <option value="qrcode">QR Code</option>
             </select>
         </label>
         <button type="submit">Generate</button>
     </form>
-    <img id="barcode-image" alt="Barcode Image" />
+    <canvas id="barcode-canvas"></canvas>
+    <img id="barcode-image" alt="Barcode Image" style="display: none;" />
 
     <script>
-        document.getElementById("barcode-form").onsubmit = async function (e) {
+        document.getElementById("barcode-form").onsubmit = function (e) {
             e.preventDefault();
             const text = document.getElementById("text").value;
             const type = document.getElementById("type").value;
-            const response = await fetch(`/generate-barcode?text=${text}&type=${type}`);
-            const blob = await response.blob();
-            document.getElementById("barcode-image").src = URL.createObjectURL(blob);
+            const canvas = document.getElementById("barcode-canvas");
+            const img = document.getElementById("barcode-image");
+
+            if (type === "barcode") {
+                JsBarcode(canvas, text, { format: "CODE128" });
+                img.style.display = "none";
+                canvas.style.display = "block";
+            } else if (type === "qrcode") {
+                canvas.style.display = "none";
+                QRCode.toDataURL(text, { width: 200 }, function (err, url) {
+                    if (!err) {
+                        img.src = url;
+                        img.style.display = "block";
+                    }
+                });
+            }
         };
     </script>
 </body>
